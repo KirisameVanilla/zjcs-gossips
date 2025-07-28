@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF 导航展示</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <h2>📚 文档目录</h2>
+      <ul id="pdf-list">
+        <li data-pdf="pdf/吃瓜1.0.pdf">GGbong-1.0</li>
+        <!--<li data-pdf="pdf/chapter2.pdf">第二章：进阶操作</li>-->
+        <!--<li data-pdf="pdf/chapter3.pdf">第三章：高级配置</li>-->
+      </ul>
+    </aside>
+
+    <!-- 主内容区：PDF 显示 -->
+    <main class="content">
+      <iframe id="pdf-frame" src="" type="application/pdf">
+        您的浏览器不支持 iframe 显示 PDF。
+      </iframe>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
