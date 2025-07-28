@@ -3,20 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>杖剑传说吃瓜小站</title>
+  <title>杖剑传说吃瓜小站-吃瓜</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
       font-family: sans-serif;
-      background: #0000000a;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      background: #f4f4f4;
     }
     .header {
       background: #2c3e50;
@@ -30,76 +24,105 @@
       margin-left: 15px;
       text-decoration: none;
     }
-    iframe {
-      flex: 1;
-      border: none;
-      width: 100%;
-    }
-    .error {
+    #loading {
       text-align: center;
       padding: 40px;
+      font-size: 1.2em;
+      color: #555;
+    }
+    #pdf-container {
+      width: 100%;
+      overflow-y: auto;
+      flex: 1;
+      background: white;
+    }
+    .page-canvas {
+      display: block;
+      margin: 10px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 100%;
+      height: auto !important;
+    }
+    .error {
       color: #e74c3c;
+      text-align: center;
+      padding: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- 顶部标题栏 -->
-    <div class="header">
-      <span id="filename">正在加载...</span>
-      <a href="/" target="_parent">返回首页</a>
-    </div>
-
-    <!-- PDF 显示区 -->
-    <iframe id="pdf-frame" type="application/pdf" style="display: none;"></iframe>
-
-    <!-- 错误提示 -->
-    <div id="error" class="error" style="display: none;">
-      ❌ 找不到该 PDF 文件：<span id="error-filename"></span>
-    </div>
+  <div class="header">
+    <span id="filename">加载中...</span>
+    <a href="/">返回首页</a>
   </div>
 
+  <div id="loading">📄 正在加载 PDF...</div>
+  <div id="pdf-container"></div>
+
+  <!-- 引入 PDF.js（CDN） -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    // 设置 worker 路径
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const fileName = urlParams.get("file");
+      const fileElement = document.getElementById("filename");
+      const loading = document.getElementById("loading");
+      const container = document.getElementById("pdf-container");
 
-      const pdfFrame = document.getElementById("pdf-frame");
-      const errorDiv = document.getElementById("error");
-      const filenameSpan = document.getElementById("filename");
-      const errorFilenameSpan = document.getElementById("error-filename");
-
-      // 验证文件名是否合法（防止路径穿越）
-      if (!fileName || !/^[a-zA-Z0-9._-]+\.pdf$/i.test(fileName)) {
+      // 验证文件名
+      if (!fileName || !/^[a-zA-Z0-9._\-]+\.pdf$/i.test(fileName)) {
         showError("无效的文件名");
         return;
       }
 
       const pdfPath = `/read/pdf/${fileName}`;
+      fileElement.textContent = fileName;
 
-      filenameSpan.textContent = fileName;
+      try {
+        // 获取 PDF
+        const loadingTask = pdfjsLib.getDocument(pdfPath);
+        const pdf = await loadingTask.promise;
+        loading.textContent = `📄 加载中... 共 ${pdf.numPages} 页`;
 
-      // 尝试加载 PDF
-      pdfFrame.src = pdfPath;
+        // 清空容器
+        container.innerHTML = "";
 
-      // 检查是否加载成功（通过监听 error 事件）
-      pdfFrame.onload = () => {
-        if (pdfFrame.contentWindow.document.title === "404") {
-          // 某些服务器会返回 404 页面，但 iframe 可能仍会加载
-          showError(fileName);
-        } else {
-          pdfFrame.style.display = "block";
+        // 动态缩放：手机小一些
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const scale = isMobile ? 0.8 : 1.2;
+
+        // 逐页渲染
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement("canvas");
+          canvas.className = "page-canvas";
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          const context = canvas.getContext("2d");
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          container.appendChild(canvas);
         }
-      };
 
-      pdfFrame.onerror = () => {
-        showError(fileName);
-      };
+        loading.style.display = "none";
 
-      function showError(name) {
-        errorFilenameSpan.textContent = name;
-        errorDiv.style.display = "block";
-        filenameSpan.textContent = "加载失败";
+      } catch (error) {
+        console.error("PDF 加载失败:", error);
+        showError(`无法加载 PDF：${error.message}`);
+      }
+
+      function showError(msg) {
+        loading.style.display = "none";
+        container.innerHTML = `<div class="error">❌ ${msg}</div>`;
       }
     });
   </script>
