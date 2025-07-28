@@ -4,28 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>杖剑传说吃瓜小站</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: "Microsoft YaHei", "SimHei", sans-serif;
+      background: #f5f1e6;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.8;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 3.5em;
+      color: #b72a2a;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      letter-spacing: 4px;
+    }
+    h2 {
+      color: #5a3b0a;
+      font-size: 1.5em;
+      margin: 30px 0 15px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      margin: 12px 0;
+    }
+    ul li a {
+      font-size: 1.2em;
+      color: #1abc9c;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    ul li a:hover {
+      color: white;
+      background: #1abc9c;
+      transform: scale(1.05);
+    }
+    footer {
+      margin-top: 50px;
+      color: #888;
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
-      <h2>📚 文档目录</h2>
-      <ul id="pdf-list">
-        <li data-pdf="pdf/吃瓜1.0.pdf">GGbong-1.0</li>
-        <!--<li data-pdf="pdf/chapter2.pdf">第二章：进阶操作</li>-->
-        <!--<li data-pdf="pdf/chapter3.pdf">第三章：高级配置</li>-->
-      </ul>
-    </aside>
+    <h1>杖剑传说吃瓜小站</h1>
+    <p>江湖风雨多，瓜田不打烊 🍉</p>
+    <p>📩 投稿：
+      <a href="mailto:vanillaaaajp@gmail.com">vanillaaaajp@gmail.com</a>
+    </p>
 
-    <!-- 主内容区：PDF 显示 -->
-    <main class="content">
-      <iframe id="pdf-frame" src="" type="application/pdf">
-        您的浏览器不支持 iframe 显示 PDF。
-      </iframe>
-    </main>
+    <h2>📖 吃瓜目录</h2>
+    <ul>
+      <li><a href="/read?file=2703ggbong1.pdf">吃瓜纪事·第一回：谁动了我家的拍卖行！？</a></li>
+    </ul>
+
+    <footer>
+      &copy; 2025 杖剑传说吃瓜委员会 | 瓜源并非仅供娱乐，真实性有保障
+    </footer>
   </div>
-
-  <script src="js/main.js"></script>
 </body>
 </html>

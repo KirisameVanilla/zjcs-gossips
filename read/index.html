@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>杖剑传说吃瓜小站</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: #0000000a;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .header {
+      background: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+    .header a {
+      color: #1abc9c;
+      margin-left: 15px;
+      text-decoration: none;
+    }
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部标题栏 -->
+    <div class="header">
+      <span id="filename">正在加载...</span>
+      <a href="/" target="_parent">返回首页</a>
+    </div>
+
+    <!-- PDF 显示区 -->
+    <iframe id="pdf-frame" type="application/pdf" style="display: none;"></iframe>
+
+    <!-- 错误提示 -->
+    <div id="error" class="error" style="display: none;">
+      ❌ 找不到该 PDF 文件：<span id="error-filename"></span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const fileName = urlParams.get("file");
+
+      const pdfFrame = document.getElementById("pdf-frame");
+      const errorDiv = document.getElementById("error");
+      const filenameSpan = document.getElementById("filename");
+      const errorFilenameSpan = document.getElementById("error-filename");
+
+      // 验证文件名是否合法（防止路径穿越）
+      if (!fileName || !/^[a-zA-Z0-9._-]+\.pdf$/i.test(fileName)) {
+        showError("无效的文件名");
+        return;
+      }
+
+      const pdfPath = `/read/pdf/${fileName}`;
+
+      filenameSpan.textContent = fileName;
+
+      // 尝试加载 PDF
+      pdfFrame.src = pdfPath;
+
+      // 检查是否加载成功（通过监听 error 事件）
+      pdfFrame.onload = () => {
+        if (pdfFrame.contentWindow.document.title === "404") {
+          // 某些服务器会返回 404 页面，但 iframe 可能仍会加载
+          showError(fileName);
+        } else {
+          pdfFrame.style.display = "block";
+        }
+      };
+
+      pdfFrame.onerror = () => {
+        showError(fileName);
+      };
+
+      function showError(name) {
+        errorFilenameSpan.textContent = name;
+        errorDiv.style.display = "block";
+        filenameSpan.textContent = "加载失败";
+      }
+    });
+  </script>
+</body>
+</html>
